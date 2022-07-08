@@ -1,5 +1,5 @@
 # zSoftskinCollisions
-This plugin allow to get intersection from ray and composite models.
+This plugin allows to get intersection with composite models.
 You can trace the NPCs from any plugins or patches. For that you need to define a new traceray flag.
 ```cpp
 enum {
