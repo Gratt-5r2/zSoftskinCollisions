@@ -24,10 +24,10 @@ For example, get the intersection point of 5 meters from camera view.
   }
 
   void Game_Loop() {
-    oCWorld* world = ogame->GetGameWorld();
+    oCWorld* world   = ogame->GetGameWorld();
     zCVob* cameraVob = ogame->GetCameraVob();
-    zVEC3 rayStart = cameraVob->GetPositionWorld();
-    zVEC3 ray = cameraVob->GetAtVectorWorld() * 500.0f;
+    zVEC3 rayStart   = cameraVob->GetPositionWorld();
+    zVEC3 ray        = cameraVob->GetAtVectorWorld() * 500.0f;
 
     int ok = world->TraceRayNearestHit( rayStart, ray, player, zTRACERAY_NPC_SOFTSKIN );
     if( ok ) {
