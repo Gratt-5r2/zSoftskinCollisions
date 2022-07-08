@@ -16,10 +16,10 @@ namespace GOTHIC_ENGINE {
   auto nodeCache = GetMemPage<int*>( 5, 0x80000 );
 
 
-  uint16 GetBestNodeId( const uint16& a, const uint16& b, const uint16& c ) {
+  inline uint16 GetBestNodeId( const uint16& a, const uint16& b, const uint16& c ) {
     if( a == b || a == c ) return a;
     if( b == a || b == c ) return b;
-    if( c == a || c == b ) return b;
+    if( c == a || c == b ) return c;
     return a;
   }
 
@@ -47,14 +47,14 @@ namespace GOTHIC_ENGINE {
   }
 
 
-  zTSimpleMeshList zCProgMeshProto::GetMeshPool( zVEC3* posCache ) {
+  zTSimpleMeshList zCProgMeshProto::GetMeshList( zVEC3* posCache ) {
     auto& pair = MeshFrameCache[this];
     if( !pair.IsNull() )
       return pair;
 
-    zTSimpleMeshList pool;
-    pool.Insert( GetMesh( posCache ) );
-    MeshFrameCache.Insert( this, pool );
-    return pool;
+    zTSimpleMeshList list;
+    list.Insert( GetMesh( posCache ) );
+    MeshFrameCache.Insert( this, list );
+    return list;
   }
 }

@@ -68,11 +68,11 @@ namespace GOTHIC_ENGINE {
   inline zTSimpleMeshList GetMeshListFromVisual( zCVisual* visual ) {
     zCMorphMesh* mesh = visual->CastTo<zCMorphMesh>();
     if( mesh )
-      return mesh->morphMesh->GetMeshPool( Null );
+      return mesh->morphMesh->GetMeshList( Null );
 
     zCProgMeshProto* meshProto = visual->CastTo<zCProgMeshProto>();
     if( meshProto )
-      return meshProto->GetMeshPool( Null );
+      return meshProto->GetMeshList( Null );
 
     return zTSimpleMeshList();
   }
