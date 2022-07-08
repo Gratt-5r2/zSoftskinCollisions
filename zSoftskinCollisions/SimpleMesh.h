@@ -15,6 +15,12 @@ namespace GOTHIC_ENGINE {
 		Array<zTSimplePolygon*> Polygons;
 		zTSimplePolygon* AddTriangle( const zVEC3& a, const zVEC3& b, const zVEC3& c );
 		int TraceRay( const zVEC3& start, const zVEC3& ray, const int& flags, zTTraceRayReport& report );
+		void Draw( const zMAT4& trafo, const zCOLOR& color );
+		void DrawDebug( const zMAT4& trafo, const zCOLOR& color );
 		~zTSimpleMesh();
 	};
+
+	typedef Array<zTSimpleMesh*> zTSimpleMeshList;
+
+	Map<zCVisual*, zTSimpleMeshList> MeshFrameCache;
 }

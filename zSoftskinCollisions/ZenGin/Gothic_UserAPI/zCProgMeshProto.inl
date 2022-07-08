@@ -4,3 +4,4 @@
 // Add your methods here
 
 struct zTSimpleMesh* GetMesh( zVEC3* posCache );
+struct Array<zTSimpleMesh*> GetMeshPool( zVEC3* posCache );

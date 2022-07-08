@@ -42,4 +42,16 @@ namespace GOTHIC_ENGINE {
     
     return mesh;
   }
+
+
+  zTSimpleMeshList zCProgMeshProto::GetMeshPool( zVEC3* posCache ) {
+    auto& pair = MeshFrameCache[this];
+    if( !pair.IsNull() )
+      return pair;
+
+    zTSimpleMeshList pool;
+    pool.Insert( GetMesh( posCache ) );
+    MeshFrameCache.Insert( this, pool );
+    return pool;
+  }
 }

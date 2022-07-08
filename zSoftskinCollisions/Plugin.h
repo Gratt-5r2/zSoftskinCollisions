@@ -3,5 +3,7 @@
 // File: "Headers.h"
 
 namespace GOTHIC_ENGINE {
-  // Add your code here . . .
+  bool HasFlag( const int& flags, const int& flag ) {
+    return (flags & flag) == flag;
+  }
 }

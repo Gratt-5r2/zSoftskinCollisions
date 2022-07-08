@@ -37,7 +37,7 @@ namespace GOTHIC_ENGINE {
     return poly;
   }
 
-  static zCPolygon* TriangleTmp = CreateTriangle();
+  static zCPolygon* TriangleTmp = CHECK_THIS_ENGINE ? CreateTriangle() : Null;
 
 
   void zTSimplePolygon::CalcNormal() {
@@ -68,6 +68,9 @@ namespace GOTHIC_ENGINE {
     Polygons.Insert( poly );
     return poly;
 	}
+
+
+  
 
 
 	int zTSimpleMesh::TraceRay( const zVEC3& start, const zVEC3& ray, const int& flags, zTTraceRayReport& report ) {
@@ -106,6 +109,25 @@ namespace GOTHIC_ENGINE {
 
     return report.foundHit;
 	}
+
+
+  void zTSimpleMesh::Draw( const zMAT4& trafo, const zCOLOR& color ) {
+    for( uint i = 0; i < Polygons.GetNum(); i++ ) {
+      zTSimplePolygon* poly = Polygons[i];
+      zVEC3 vertA = trafo * poly->Triangle[VA];
+      zVEC3 vertB = trafo * poly->Triangle[VB];
+      zVEC3 vertC = trafo * poly->Triangle[VC];
+      zlineCache->Line3D( vertA, vertB, color, 0 );
+      zlineCache->Line3D( vertB, vertC, color, 0 );
+      zlineCache->Line3D( vertC, vertA, color, 0 );
+    }
+  }
+
+
+  void zTSimpleMesh::DrawDebug( const zMAT4& trafo, const zCOLOR& color ) {
+    if( ogame->GetGameWorld()->showTraceRayLines )
+      Draw( trafo, color );
+  }
 
 
 	zTSimpleMesh::~zTSimpleMesh() {

@@ -21,6 +21,13 @@ namespace GOTHIC_ENGINE {
   }
 
   void Game_Loop() {
+    auto& array = MeshFrameCache.GetArray();
+    for( uint i = 0; i < array.GetNum(); i++ ) {
+      zTSimpleMeshList pool = array[i];
+      pool.DeleteData();
+    }
+
+    MeshFrameCache.Clear();
   }
 
   void Game_PostLoop() {

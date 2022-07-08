@@ -3,9 +3,14 @@
 
 namespace GOTHIC_ENGINE {
   const zSTRING BIP01_HEAD_NAME = "BIP01 HEAD";
+  const zSTRING ZS_PREFIX = "ZS_";
 
 
-  Array<zTSimpleMesh*> zCModel::GetMeshList() {
+  zTSimpleMeshList zCModel::GetMeshList() {
+    auto& pair = MeshFrameCache[this];
+    if( !pair.IsNull() )
+      return pair;
+
     Array<zMAT4*> trafoList;
     for( int i = 0; i < nodeList.GetNum(); i++ ) {
       nodeList[i]->trafoObjToCam = GetTrafoNodeToModel( nodeList[i] );
@@ -18,21 +23,18 @@ namespace GOTHIC_ENGINE {
       meshList.Insert( softSkin->GetMesh( trafoList ) );
     }
 
+    MeshFrameCache.Insert( this, meshList );
     return meshList;
   }
 
 
   int zCModel::TraceRaySoftskin( const zVEC3& start, const zVEC3& ray, int flags, zTTraceRayReport& report ) {
     int hitFound = False;
-    auto meshList = GetMeshList();
+    zTSimpleMeshList meshList = GetMeshList();
     if( (flags & zTRACERAY_FIRSTHIT) == zTRACERAY_FIRSTHIT ) {
       for( uint i = 0; i < meshList.GetNum(); i++ ) {
-        auto mesh = meshList[i];
+        zTSimpleMesh* mesh = meshList[i];
         if( mesh->TraceRay( start, ray, flags, report ) ) {
-          if( report.foundPoly ) {
-            (int&)report.foundVertex = report.foundPoly->flags.sectorIndex;
-            report.foundPoly = Null;
-          }
           hitFound = True;
           break;
         }
@@ -41,25 +43,20 @@ namespace GOTHIC_ENGINE {
     else {
       float nearest = float_MAX;
       for( uint i = 0; i < meshList.GetNum(); i++ ) {
-        auto mesh = meshList[i];
+        zTSimpleMesh* mesh = meshList[i];
         zTTraceRayReport reportTmp;
         if( mesh->TraceRay( start, ray, flags, reportTmp ) ) {
           zVEC3 hitPos = reportTmp.foundIntersection;
           float distance = start.Distance( hitPos );
-          if( i == 0 || distance < nearest ) {
+          if( distance < nearest ) {
             nearest = distance;
             report = reportTmp;
-            if( report.foundPoly ) {
-              (int&)report.foundVertex = report.foundPoly->flags.sectorIndex;
-              report.foundPoly = Null;
-            }
             hitFound = True;
           }
         }
       }
     }
 
-    meshList.DeleteData();
     return hitFound;
   }
 
@@ -79,7 +76,7 @@ namespace GOTHIC_ENGINE {
     auto meshList = GetMeshList();
     for( uint i = 0; i < meshList.GetNum(); i++ ) {
       auto mesh = meshList[i];
-      for( int p = 0; p < mesh->Polygons.GetNum(); p++ ) {
+      for( uint p = 0; p < mesh->Polygons.GetNum(); p++ ) {
         zTSimplePolygon* poly = mesh->Polygons[p];
         zVEC3 vertA = trafo * poly->Triangle[VA];
         zVEC3 vertB = trafo * poly->Triangle[VB];
@@ -98,14 +95,19 @@ namespace GOTHIC_ENGINE {
 
   void zCModel::CalcModelBBox3DWorld_Union() {
     THISCALL( Hook_zCModel_CalcModelBBox3DWorld )();
-    zCModelNodeInst* node = SearchNode( BIP01_HEAD_NAME );
-    if( !node || !node->nodeVisual )
-      return;
+    for( int i = 0; i < nodeList.GetNum(); i++ ) {
+      zCModelNodeInst* node = nodeList[i];
+      if( !node->nodeVisual )
+        continue;
 
-    zMAT4 trafo = GetTrafoNodeToModel( node );
-    zTBBox3D bboxHead = node->nodeVisual->GetBBox3D();
-    bboxHead.Transform( trafo, bboxHead );
-    bbox3D.AddPoint( bboxHead.mins );
-    bbox3D.AddPoint( bboxHead.maxs );
+      if( node->protoNode->nodeName.StartWith( ZS_PREFIX ) )
+        continue;
+
+      zMAT4 trafo = GetTrafoNodeToModel( node );
+      zTBBox3D bbox3D = node->nodeVisual->GetBBox3D();
+      bbox3D.Transform( trafo, bbox3D );
+      bbox3D.AddPoint( bbox3D.mins );
+      bbox3D.AddPoint( bbox3D.maxs );
+    }
   }
 }
