@@ -31,7 +31,7 @@ namespace GOTHIC_ENGINE {
   int zCModel::TraceRaySoftskin( const zVEC3& start, const zVEC3& ray, int flags, zTTraceRayReport& report ) {
     int hitFound = False;
     zTSimpleMeshList meshList = GetMeshList();
-    if( (flags & zTRACERAY_FIRSTHIT) == zTRACERAY_FIRSTHIT ) {
+    if( HasFlag( flags, zTRACERAY_FIRSTHIT ) ) {
       for( uint i = 0; i < meshList.GetNum(); i++ ) {
         zTSimpleMesh* mesh = meshList[i];
         if( mesh->TraceRay( start, ray, flags, report ) ) {

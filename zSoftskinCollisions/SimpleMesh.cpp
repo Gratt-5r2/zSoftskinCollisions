@@ -51,7 +51,7 @@ namespace GOTHIC_ENGINE {
     TriangleTmp->SetTriangleData( Triangle );
     TriangleTmp->SetPlaneData( Normal, Distance );
 
-    int hitFound = (flags & zTRACERAY_POLY_2SIDED) == zTRACERAY_POLY_2SIDED ?
+    int hitFound = HasFlag( flags, zTRACERAY_POLY_2SIDED ) ?
       TriangleTmp->CheckRayPolyIntersection2Sided( start, ray, intersection, distance ) :
       TriangleTmp->CheckRayPolyIntersection      ( start, ray, intersection, distance );
 
@@ -60,22 +60,19 @@ namespace GOTHIC_ENGINE {
 
 
   zTSimplePolygon* zTSimpleMesh::AddTriangle( const zVEC3& a, const zVEC3& b, const zVEC3& c ) {
-		zTSimplePolygon* poly = new zTSimplePolygon();
-		poly->Triangle[VA] = a;
-		poly->Triangle[VB] = b;
-		poly->Triangle[VC] = c;
+    zTSimplePolygon* poly = new zTSimplePolygon();
+    poly->Triangle[VA] = a;
+    poly->Triangle[VB] = b;
+    poly->Triangle[VC] = c;
     poly->CalcNormal();
     Polygons.Insert( poly );
     return poly;
-	}
+  }
 
 
-  
-
-
-	int zTSimpleMesh::TraceRay( const zVEC3& start, const zVEC3& ray, const int& flags, zTTraceRayReport& report ) {
+  int zTSimpleMesh::TraceRay( const zVEC3& start, const zVEC3& ray, const int& flags, zTTraceRayReport& report ) {
     report.foundHit = False;
-    if( (flags & zTRACERAY_FIRSTHIT) == zTRACERAY_FIRSTHIT ) {
+    if( HasFlag( flags, zTRACERAY_FIRSTHIT ) ) {
       zVEC3 intersection;
       for( uint i = 0; i < Polygons.GetNum(); i++ ) {
         float distance;
@@ -108,7 +105,7 @@ namespace GOTHIC_ENGINE {
     }
 
     return report.foundHit;
-	}
+  }
 
 
   void zTSimpleMesh::Draw( const zMAT4& trafo, const zCOLOR& color ) {
@@ -130,7 +127,7 @@ namespace GOTHIC_ENGINE {
   }
 
 
-	zTSimpleMesh::~zTSimpleMesh() {
-		Polygons.DeleteData();
-	}
+  zTSimpleMesh::~zTSimpleMesh() {
+    Polygons.DeleteData();
+  }
 }

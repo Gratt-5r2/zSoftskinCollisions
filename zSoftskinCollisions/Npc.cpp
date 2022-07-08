@@ -26,11 +26,11 @@ namespace GOTHIC_ENGINE {
 
 
   int oCNpc::TraceRay_Union( zVEC3 const& start, zVEC3 const& ray, int flags, zTTraceRayReport& report ) {
-    if( (flags & zTRACERAY_NPC_SOFTSKIN) == zTRACERAY_NPC_SOFTSKIN ) {
+    if( HasFlag( flags, zTRACERAY_NPC_SOFTSKIN ) ) {
       int hitFound = False;
       if( TraceRayNodes( start, ray, flags, report ) ) {
         hitFound = True;
-        if( (flags & zTRACERAY_FIRSTHIT) == zTRACERAY_FIRSTHIT )
+        if( HasFlag( flags, zTRACERAY_FIRSTHIT ) )
           return True;
       }
 
@@ -62,75 +62,6 @@ namespace GOTHIC_ENGINE {
       report.foundVob = this;
 
     return ok;
-  }
-
-
-  int oCNpc::TraceRayHead( const zVEC3& start, const zVEC3& ray, int flags, zTTraceRayReport& report ) {
-    zCModel* model = GetModel();
-    if( !model )
-      return False;
-
-    zCModelNodeInst* headNode = model->SearchNode( BIP01_HEAD_NAME );
-    if( headNode ) {
-      zCVisual* headVisual = headNode->nodeVisual;
-      if( !headVisual )
-        return False;
-      
-      zMAT4 headTrafo       = GetTrafoModelNodeToWorld( headNode );
-      zVEC3 startLocal      = headTrafo.InverseLinTrafo() * start;
-      zVEC3 rayLocal        = headTrafo.Transpose() * ray;
-      zCMorphMesh* headMesh = headVisual->CastTo<zCMorphMesh>();
-      if( headMesh && headMesh->morphMesh ) {
-        zTBBox3D& bbox = headMesh->GetBBox3D();
-        zVEC3 intersection;
-        if( !bbox.TraceRay( startLocal, rayLocal, intersection ) )
-          return False;
-
-        zTSimpleMesh* mesh = headMesh->morphMesh->GetMeshPool( Null ).GetFirst();
-        if( !mesh )
-          return False;
-
-        int ok = mesh->TraceRay( startLocal, rayLocal, flags, report );
-        if( ok ) {
-          report.foundVob = this;
-          report.foundPoly = Null;
-          report.foundIntersection = headTrafo * report.foundIntersection;
-          (int&)report.foundVertex = GetModelNodeId( GetModel(), BIP01_HEAD_NAME );
-        }
-
-        return ok;
-      }
-
-      zCProgMeshProto* headProto = headVisual->CastTo<zCProgMeshProto>();
-      if( headProto ) {
-        zTBBox3D& bbox = headProto->GetBBox3D();
-        zVEC3 intersection;
-        if( !bbox.TraceRay( startLocal, rayLocal, intersection ) )
-          return False;
-
-        zTSimpleMesh* mesh = headProto->GetMeshPool( Null ).GetFirst();
-        if( !mesh )
-          return False;
-
-        int ok = mesh->TraceRay( startLocal, rayLocal, flags, report );
-        if( ok ) {
-          report.foundVob = this;
-          report.foundPoly = Null;
-          report.foundIntersection = headTrafo * report.foundIntersection;
-          (int&)report.foundVertex = GetModelNodeId( GetModel(), BIP01_HEAD_NAME );
-        }
-
-        return ok;
-      }
-
-      int ok = headVisual->TraceRay( startLocal, rayLocal, flags, report );
-      if( ok )
-        report.foundVob = this;
-
-      return ok;
-    }
-
-    return False;
   }
 
 
@@ -182,7 +113,6 @@ namespace GOTHIC_ENGINE {
       report.foundPoly = Null;
       report.foundIntersection = trafo * report.foundIntersection;
       (int&)report.foundVertex = GetModelNodeId( GetModel(), node );
-      // mesh->DrawDebug( trafo, GFX_GOLD );
     }
 
     return ok;

@@ -4,6 +4,9 @@
 namespace GOTHIC_ENGINE {
   template<typename T>
   T GetMemPage( const int& index, const int& offset ) {
+    if( !CHECK_THIS_ENGINE )
+      return (T)0;
+
     uint address = CMemPage::GetPage( 5 )->GetAddress();
     return (T)(address + offset);
   }
