@@ -13,13 +13,13 @@ For example, get the intersection point of 5 meters from camera view.
     zVEC3 up = trafo.GetUpVector();
     zVEC3 right = trafo.GetRightVector();
     zlineCache->Line3D(
-      location + up * -size + right * -size,
-      location + up * +size + right * +size,
+      location + (-up + -right) * size,
+      location + ( up +  right) * size,
       color, 0 );
 
     zlineCache->Line3D(
-      location + up * +size + right * -size,
-      location + up * -size + right * +size,
+      location + ( up + -right) * size,
+      location + (-up +  right) * size,
       color, 0 );
   }
 
@@ -52,3 +52,5 @@ For example, get the intersection point of 5 meters from camera view.
 
 
 ![image](https://user-images.githubusercontent.com/55413597/178073836-0cfd9a3e-a5aa-454c-aebf-4394a7da2f43.png)
+
+![image](https://user-images.githubusercontent.com/55413597/178100099-e753a28f-6d80-4472-a5b3-cb283cb1f45d.png)
